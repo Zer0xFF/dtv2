@@ -99,7 +99,7 @@ class dtv2:
         if interfaces[1]['product_string'] == '':
             return False
         else:
-            self.iface = interfaces[1]
+            self.iface = interfaces[-2]
             return True
 
     def __ouverture_device(self):
