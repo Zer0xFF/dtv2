@@ -276,6 +276,18 @@ class dtv2:
             raise Exception('erreur...')
         self.dev.close()
 
+    def set_keys(self, key_colors):
+        """ demande l'application d'un changement sur une touche
+        """
+        self.__ouverture_device()
+        for key, colour in key_colors:
+            self.__trame_couleur_touche(key, colour)
+            self.__ecriture_device()
+            # if self.__ecriture_device() == -1:
+            #     self.dev.close()
+            #     raise Exception('erreur...')
+        self.dev.close()
+
     def category(self, categorie, couleur_RGB):
         """demande l'application d'un changement sur une catégorie de
         touches
