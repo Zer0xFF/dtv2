@@ -1,0 +1,102 @@
+import trackwindow
+import win32con
+
+g_last_app = None
+g_active_app = -1
+g_config = {}
+g_kb = None
+
+g_config['Play.exe'] = [
+    ['a' , (0x00, 0xff, 0xff)], 
+    ['s' , (0x00, 0xff, 0xff)],
+    ['z' , (0x00, 0xff, 0xff)],
+    ['x' , (0x00, 0xff, 0xff)],
+
+    ['t' , (0xff, 0xff, 0x00)],
+    ['f' , (0xff, 0xff, 0x00)],
+    ['g' , (0xff, 0xff, 0x00)],
+    ['h' , (0xff, 0xff, 0x00)],
+    ['c' , (0xff, 0xff, 0x00)],
+
+    ['1' , (0xff, 0xff, 0xff)],
+    ['2' , (0xff, 0xff, 0xff)],
+    ['3' , (0xff, 0xff, 0xff)],
+
+
+    ['8' , (0x00, 0x00, 0xff)],
+    ['9' , (0x00, 0x00, 0xff)],
+    ['0' , (0x00, 0x00, 0xff)],
+
+    ['i' , (0xff, 0x00, 0xff)],
+    ['j' , (0xff, 0x00, 0xff)],
+    ['k' , (0xff, 0x00, 0xff)],
+    ['l' , (0xff, 0x00, 0xff)],
+
+    ['BACKS' , (0x00, 0xff, 0x00)],
+    ['enter' , (0x00, 0xff, 0x00)],
+
+    ['left' , (0xff, 0x00, 0x00)],
+    ['right' , (0xff, 0x00, 0x00)],
+    ['up', (0xff, 0x00, 0x00,)],
+    ['down' , (0xff, 0x00, 0x00)],
+]
+g_config['Borderlands3.exe'] = [
+    ['a' , (0x00, 0xff, 0x00)], 
+    ['s' , (0x00, 0xff, 0x00)],
+    ['d' , (0x00, 0xff, 0x00)],
+    ['w' , (0x00, 0xff, 0x00)],
+
+    ['q' , (0xff, 0xff, 0x00)],
+    ['e' , (0xff, 0xff, 0x00)],
+    ['z' , (0xff, 0xff, 0x00)],
+    ['x' , (0xff, 0xff, 0x00)],
+    ['c' , (0xff, 0xff, 0x00)],
+
+    ['tab' , (0xff, 0x00, 0xff)],
+    ['lshift' , (0xff, 0x00, 0xff)],
+    ['i' , (0xff, 0x00, 0xff)],
+    ['m' , (0xff, 0x00, 0xff)],
+
+    ['esc' , (0xff, 0x00, 0x00)],
+    ['g' , (0xff, 0x00, 0x00)],
+    ['v' , (0xff, 0x00, 0x00)],
+
+    ['f' , (0x00, 0x00, 0xff)],
+    ['1' , (0x00, 0x00, 0xff)],
+    ['2' , (0x00, 0x00, 0xff)],
+    ['3' , (0x00, 0x00, 0xff)],
+    ['4' , (0x00, 0x00, 0xff)],
+
+    ['r' , (0x00, 0xff, 0xff)],
+    ['lctrl' , (0x00, 0xff, 0xff)],
+    ['space' , (0x00, 0xff, 0xff)],
+
+]
+
+def drevo_callback(hWinEventHook, event, hwnd, idObject, idChild, dwEventThread, dwmsEventTime):
+    global g_last_app, g_active_app, g_kb
+
+    current_app = None
+    processID = trackwindow.getProcessID(dwEventThread, hwnd)
+    if processID:
+        filename = trackwindow.getProcessFilename(processID)
+        if filename:
+            current_app = filename.split('\\')[-1]
+            if(g_last_app != current_app):
+                g_last_app = current_app
+                if(current_app in g_config):
+                    if(g_active_app != current_app):
+                        g_active_app = current_app
+                        key_colors =  g_config[current_app]
+                        g_kb.kbd((0, 0, 0))
+                        g_kb.set_keys(key_colors)
+                elif(g_active_app):
+                    g_active_app = None
+                    g_kb.stream((0, 0, 0), brightness=100, speed=6, rainbow=True)
+                    
+
+def loop(my_kb):
+    global g_kb
+    g_kb = my_kb
+    trackwindow.loop(drevo_callback, [win32con.EVENT_SYSTEM_FOREGROUND, win32con.EVENT_OBJECT_FOCUS])
+    pass
