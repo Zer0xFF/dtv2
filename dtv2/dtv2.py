@@ -97,7 +97,7 @@ class dtv2:
         # si présent mais pas accessible (cf. /etc/udev/rules.d)
         # cette chaîne est vide
         for interface in interfaces:
-            if interface['usage'] == 0:
+            if interface['usage'] == 0 and interface['interface_number'] == 1:
                 self.iface = interface
                 return True
         else:
